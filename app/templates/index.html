@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<title>Storage API</title>
+<h1>Storage API v1</h1>
+<table border="1">
+    <th>route</th>
+    <th>method</th>
+    <th>description</th>
+    <tr>
+        <td>/v1/upload</td>
+        <td>POST</td>
+        <td>Uploads request.FILES['file'] to storage and returns uploaded file GUID in 'file'</td>
+    </tr>
+    <tr>
+        <td>/v1/download/[file_uuid]</td>
+        <td>GET</td>
+        <td>Returns file with GUID [file_uuid]</td>
+    </tr>
+</table>
