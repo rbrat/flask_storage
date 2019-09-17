@@ -1,6 +1,6 @@
 from flask import request, send_from_directory, redirect, jsonify, abort, render_template
 from app import app, db, upload_set
-from app.models import StoredFile, get_available_file_name, get_uuid
+from app.models import StoredFile, get_available_file_name, get_available_uuid
 from werkzeug import secure_filename
 from datetime import datetime
 import os
@@ -9,12 +9,15 @@ import os
 @app.route('/')
 @app.route('/index')
 def index():
+    """Returns documentation as HTML page"""
     return render_template('index.html')
 
 @app.route('/v1/download/<file_uuid>')
 def get_file(file_uuid):
+    """Returns file with UUID <file_uuid> sent in GET request.
+    If UUID is not found in database, returns 404.
+    """
     file = StoredFile.query.filter_by(uuid=file_uuid).first()
-    print(file)
     print(os.path.join(app.root_path, app.config['UPLOAD_FOLDER']))
     if file:
         return send_from_directory(directory=os.path.join(app.root_path, app.config['UPLOAD_FOLDER']), filename=file.filename, as_attachment=True)
@@ -24,6 +27,9 @@ def get_file(file_uuid):
 
 @app.route('/v1/upload', methods=['POST'])
 def upload_file():
+    """Saves file sent in POST request. Returns CREATED with download UUID in payload. 
+    If filename is already present in database, appends _[A-Fa-f0-9]{8} to filename. 
+    """
     if 'file' not in request.files:
         abort(400, description='No file part')
     file = request.files['file']
@@ -37,4 +43,3 @@ def upload_file():
             return jsonify({'file': stored_file.uuid}), 201
         except Exception as e:
             abort(400, description=e)
-
